@@ -1,0 +1,237 @@
+@media only screen and (max-width: 900px) {
+  .col-sm-12{
+    height: 30rem !important;
+  }
+  
+  .col-md-12
+  {
+    height: 30rem !important;
+  }
+
+  .mapdown{
+    margin-top: -2%!important;
+    z-index: 1;
+  }
+  .maptop{
+    margin-bottom: -20%!important;
+  }
+     
+  .imgcard {
+    width: 0!important;
+    height: 0 !important;
+    opacity: 0;
+    
+
+  }
+   
+  .nabar{
+    left: 75% !important;
+  }
+  
+  #map{
+    width:90% !important;
+
+    position: absolute !important;
+
+
+  }
+}
+
+#mapage{
+    background-color:#AAD4D7;
+    background-size: cover;
+    background-repeat: no-repeat;
+    height: 100%;
+    font-family: 'Numans', sans-serif;
+    background-size: 100% 60%;    
+    }
+
+    
+.navbar{
+      background-color: white;
+      width: 100%;   
+  }
+    
+.nabar  {
+  height: auto;
+  width: 135.8px;
+  text-align: center;
+  list-style: none;
+  font: normal bold 13px/1em Arial, Verdana, Helvetica;
+  padding: 0;
+  background-color:none;
+  margin-right:10px !important;
+  position: absolute;
+  left:75% !important;
+  top:15px;
+
+  }
+    
+  .nabar a {
+    padding: 18px 0;
+    border-left: 1px solid #ccc9c9;
+    text-decoration: none;
+    color: white;
+    display: block;
+  }
+        
+  .nabar li:hover, a:hover {
+          background-color:none;
+        }
+        
+  .nabar li ul {
+          display: none;
+          height: auto;
+          margin-left: 250px;
+          padding: 0;
+          position: absolute;      
+    }
+        
+  .nabar li:hover ul {
+          display: block;
+          margin-left: 200px;
+      }
+        
+  .nabar li ul li {
+          background-color: #4444448e;
+          width: 150px;
+      }
+        
+  .nabar li ul li a {
+          border-left: 1px solid #444444;
+          border-right: 1px solid #444444;
+          border-top: 1px solid #c9d4d8;
+          border-bottom: 1px solid #444444;
+          font-size: larger;
+      }
+        
+  .nabar li ul li a:hover {
+          background-color: #a3a1a1;
+      }
+  .popout { 
+            position: absolute !important;
+            float:right !important;
+    }
+  
+  .fa-arrow-circle-left
+  {
+        margin-left:30px;
+  }
+  .fa-arrow-circle-left
+  {
+          font-size: 40px;
+          color: #000000 !important;
+          transition: 0.3s;
+          animation-name: onloadAnim;
+          animation-duration: 1s;
+          
+  }
+  .fa-user-circle
+  {
+          font-size: 40px;
+          color: #000000 !important;
+          transition: 0.3s;
+          animation-name: onloadAnim;
+          animation-duration: 1s;
+          margin-left: 250px;
+          
+  }
+  .fa-arrow-circle-left:hover, .fa-user-circle:hover
+  {
+          color: #c4c4c4 !important;
+  }
+  
+  .mapdown{
+     margin: auto;
+   } 
+    
+  .card-body{
+      margin-left: 7%;
+      background-color: #c4c4c4;
+    } 
+
+  .card
+  {
+        box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+        margin: auto; 
+        
+  }
+  .card-title
+  {
+          font-weight: bolder;
+          font-size: 2rem;
+          margin-bottom: 25px;
+  }
+      
+  .card-text
+  {
+          font-size: 1rem;
+          font-weight: bold;
+          color:black;
+          margin-top:-10px;
+  }
+
+  .txt
+  {
+        display: inline-block;
+        margin-right:40px;
+        font-size: 1rem;
+  }
+  .cli
+  {
+        color:#fe8118;
+        float: right;
+        margin-top: 10px;
+        display: inline-block;
+        transition: 0.3s;
+        animation-name: onloadAnim;
+        animation-duration: 1s;
+        
+  }
+  .cli1
+  {
+       float:left ;
+       margin-top: -5px;
+  }
+  .cli:hover
+  {
+         color:black;
+         text-decoration: none;
+  }
+
+  .btn-primary
+  {
+    border: none;
+    outline: none;
+    height: 35px;
+    width:120px;
+    background: #44AB5B;
+    color: #000000;
+    font-weight: bold;
+    font-size: 15px;
+    border-radius: 10px;
+    transition: 0.3s;
+    margin-top: 10px;
+    margin-left: 30px;
+    animation-name: onloadAnim;
+    animation-duration: 1s;
+     box-shadow:  0 12.5px 10px rgba(0, 0, 0, 0.06);
+     
+}
+.btn-primary:hover
+{
+    cursor: pointer;
+    background: #ffffff;
+    color: #000000;
+}
+
+.navbar-nav.navbar-center {
+  position: absolute;
+  left: 50%;
+  transform: translatex(-50%);
+}
+.alert
+{
+  margin-top: 10px;
+  margin-left: 100px;
+}

@@ -25,7 +25,7 @@ const db = process.env.DBURI;
 mongoose
 	.connect(db, { useNewUrlParser: true, useUnifiedTopology: true,useFindAndModify: false })
 	.then(() => {
-		const PORT = process.env.PORT || 8080;
+		const PORT =3000;
 		app.listen(PORT, console.log("Server Started"));
 		console.log("Connected to DB");
 	})
@@ -68,7 +68,4 @@ app.use(
 	ownerControllers
 );
 
-  app.listen(3000,function()
-{
-  console.log("Server is running on port 3000");
-});
+ 

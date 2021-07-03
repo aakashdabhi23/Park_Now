@@ -18,7 +18,7 @@
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.js"></script>
     <link href="https://api.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.css" rel="stylesheet" />
     
-    <title>Parkings</title>
+    <title>Customer Dashboard</title>
 </head>
 
 
@@ -80,12 +80,15 @@
     <div  class="mapdown col-lg-6 col-sm-12 col-md-12" >
 
       <div style="display: flex;align-items: center;justify-content: center;">
-        <input type="text" style="border: none;border-radius: 8px;box-shadow:  0 12.5px 10px rgba(0, 0, 0, 0.06);margin-top: 10px;height: 35px;width:50%;">
-        <a class="btn btn-primary">Search</a>
-        <a class="btn btn-primary">Sort</a>
+        <form method="POST" style="width: 100%;">
+        <input type="text" name="place" placeholder="Enter Location" style="border: none;border-radius: 8px;;margin-top: 10px;height: 35px;width:50%;">
+        <button type="submit" class="btn btn-primary" formaction="/user/<%=id%>/search" value="Search" style="margin-bottom: 10px;margin-right:1px; width: 18%;height: 35px;">Search</button>
+        <button type="submit" value="Sort" class="btn btn-primary" formaction="/user/<%=id%>/sort" style="margin-bottom: 10px;width: 15%;height: 35px;">Sort</button>
+        </form>
+       
       </div>  
-    <ul style="list-style-type:none;">
-        
+      <ul style="list-style-type:none;">
+        <% for(var parking of parkings) {%>
             <li>
                 <div class="card mb-3" style="max-width: 800px; margin:60px">
                     <div class="row g-0">
@@ -94,33 +97,43 @@
                       </div>
                       <div class="col-md-8">
                         <div class="card-body">
-                          <h5 class="card-title">Title:</h5>
-                          <p class="card-text">Desc:</p>
-                          <p class="card-text"><i class="fas fa-map-marker-alt"></i>Location:</p>
-                          <p class="card-text txt"> <i class="fas fa-motorcycle"></i> ₹2Wheel:  </p>
-                          <p class="card-text txt"> <i class="fas fa-car-side"></i> ₹4Wheel:</p>
-                          <a class="btn btn-primary">Book Slot</a>
-                          <a class="btn btn-primary">Add Feedback</a>
+                          <h5 class="card-title"><%= parking.title %></h5>
+                          <p class="card-text"><%= parking.description %></p>
+                          <p class="card-text"><i class="fas fa-map-marker-alt"></i>&emsp;: <%= parking.location %></p>
+                          <p class="card-text txt"> <i class="fas fa-motorcycle"></i>: ₹ <%= parking.price2w %></p>
+                          <p class="card-text txt"> <i class="fas fa-car-side"></i>: ₹ <%= parking.price4w %></p>
+                          <p class="card-text txt"> <i class="fas fa-star"></i>:<%= parking.avgrating %></p>
+                          
+                        <a class="btn btn-primary">Book Slot</a>
+                        <a class="btn btn-primary" href="/user/<%= id %>/<%=parking._id%>/reviews">Add Feedback</a>
                         </div>
                       </div>
                     </div>
                   </div>   
                 
-                </li>      
+                </li>    
+        <% } %>  
     </ul>
 </div>
 </div>
 
-    <script
-        src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.5.1/mapbox-gl-geocoder.min.js"></script>
-    <link rel="stylesheet"
-        href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.5.1/mapbox-gl-geocoder.css"
-        type="text/css">
-  
-    <script>
-      const mapToken = 'pk.eyJ1Ijoic3JpdGVhbTE0IiwiYSI6ImNrcTg4Z2g1OTBka2oydnVoOWNvZXlrcDQifQ.dgCFMdKqKCaxrJzeUzWLkw';
-    </script>
-   <script src="/javascripts/clusterMap.js"></script>
+<script
+src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.5.1/mapbox-gl-geocoder.min.js"></script>
+<link rel="stylesheet"
+href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.5.1/mapbox-gl-geocoder.css"
+type="text/css">
+<script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.auto.min.js"></script>
+<script>
+const mapToken = '<%-process.env.MAPBOX_TOKEN%>';
+const parkings =  { features: <%-JSON.stringify(parkings)%>};
+const uid= '<%- id %>'; 
+</script>
+<script src="/javascripts/clusterMap.js"></script>
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
 </body>
 
 </html>

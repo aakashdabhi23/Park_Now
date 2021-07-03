@@ -1,9 +1,16 @@
 const express = require("express");
 const router = express.Router();
 const passport = require("passport");
+const ParkingLocation=require("../models/Location");
 const bcrypt = require("bcryptjs");
-const Owner=require("../models/Owners")
+const Owner=require("../models/Owners");
 var Userdb=require('../models/Users');
+const _=require("lodash");
+ 
+const mbxGeocoding = require("@mapbox/mapbox-sdk/services/geocoding");
+const mapBoxToken=process.env.MAPBOX_TOKEN;
+
+const geocoder=mbxGeocoding({accessToken:mapBoxToken});
 
 
 async function registration(category, email) 
@@ -17,6 +24,37 @@ async function registration(category, email)
 		return Owner.findOne({ email: email });
 	}
 }
+
+//get method to show new parking form
+router.get('/:id/newParking',(req,res)=>{
+    const id=req.params.id;
+	res.render('parkings/new',{id});
+})
+
+// post request to save new parking
+router.post('/:id',async(req,res)=>{
+    //console.log(req.body);
+    const GeoData=await geocoder.forwardGeocode({
+        query:req.body.parking.location,
+        limit:1
+    }).send()
+    const parking =new ParkingLocation(req.body.parking);
+    parking.geometry=GeoData.body.features[0].geometry;
+    parking.owner=req.owner._id;
+    parking.avgrating=0;
+    parking.location= _.startCase(_.toLower( parking.location));
+    await parking.save();
+    req.flash('success_msg','New Parking Lot Added Successfully');
+    res.redirect(`/owner/${req.owner._id}`);
+})
+
+// Get all parking of current owner
+router.get('/:id',async(req,res)=>{
+	const id=req.params.id
+    const parkings=await ParkingLocation.find({owner:id});
+    const owner=await Owner.findById(id);
+    res.render('parkings/Owner_dash',{parkings,id,owner});
+})
 
 //update owner 
 router.get('/:id/update-owner',(req,res)=>{
@@ -83,10 +121,24 @@ router.post('/:id/update-owner',(req,res)=>{
     
 });
 
-router.get('/:id',async(req,res)=>{
-	const id=req.params.id
-    const owner=await Owner.findById(id);
-    res.render('parkings/Owner_dash',{id});
-})
+// Get parking details 
+router.get('/:id/:p_id',async(req,res)=>{
+    const parking=await ParkingLocation.findById(req.params.p_id).populate({
+        path: 'reviews',
+        populate: {
+            path: 'author'
+        }
+    });
+	const id=req.params.id;
+    res.render('parkings/show',{parking,id});
+});
+
+router.get('/:id/:p_id/delete',async(req,res)=>{
+    ParkingLocation.findByIdAndDelete(req.params.p_id, function (err, docs)
+    {
+    });
+    id=req.params.id
+    res.redirect(`/owner/${id}`);
+});
 
 module.exports = router;

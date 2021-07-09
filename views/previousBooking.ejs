@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.11.2/css/all.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+ <!-- Google Fonts Roboto -->
+ <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap">
+ <!-- Bootstrap core CSS -->
+ <link rel="stylesheet" href="/css/bootstrap.min.css">
+ <!-- Material Design Bootstrap -->
+ <link rel="stylesheet" href="/css/mdb.min.css">
+ 
+ <script src="https://api.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.js"></script>
+ <link href="https://api.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.css" rel="stylesheet" />
+    <title>Booking</title>
+    <style>
+        body{
+            height: 100%;
+    
+            background-color:  #AAD4D7;
+ 
+        }
+        .navbar
+{
+    background-color: #ffffff;
+}
+.fa-arrow-circle-left
+{
+    color: #000;
+    font-size: 45px;
+    margin-left: 20px;
+    transition: 0.3s;
+    animation-name: onloadAnim;
+    animation-duration: 1s;
+}
+.fa-arrow-circle-left:hover
+{
+    color:black;
+}
+.btl{
+	color:white;
+	background-color: #44ab5b;
+	font-size: 15px !important;
+	font-weight: bold !important;
+	
+}
+
+.btl:hover{
+	color:black;
+	background-color: #fff;
+	font-size: 22px;
+	font-weight: bolder;
+}
+
+
+
+   .tableFixHead {
+        overflow-y: auto;
+        height: 100%;
+      }
+     
+      table {
+        border-collapse:collapse;
+        width: 95%;
+        height: 50%;
+      }
+      .tableFixHead thead th {
+        position: sticky;
+        top: 0;
+      }
+      th{
+      text-align:center;
+       background-color: black;
+       border:0px solid #ccc;
+      }
+      
+      td {
+        padding: 10px;
+        border: 0px solid #ccc;
+      }
+      .t1{
+        font-size:20px !important ;
+      }
+        
+    </style>
+</head>
+<body >
+  <nav class="navbar sticky-top shadow p-2 mb-2">
+   <a class="navbar-brand" href="/user/<%=user_id%>"><i class="fas fa-arrow-circle-left"></i></a>
+</nav>
+<br>
+    <div style = "color:Black;margin-bottom:25px" align = "center">
+        <h3>Your Previous Bookings</h3>
+    </div>
+    <div class="tableFixHead">    
+    <table align="center">
+        <thead>
+          <tr>
+            <th style = "color: #000; background:white"><h5>Parking Title</h5></th>  
+            <th style = "color: #000; background:white"><h5>Location</h5></th>
+            <th style = "color: #000; background:white"><h5>Start Time</h5></th>
+            <th style = "color: #000; background:white"><h5>Duration</h5></th>
+            <th style = "color: #000; background:white" ><h5>Vehicle No.</h5></th>
+            <th style = "color: #000; background:white" ><h5>Action</h5></th>
+          </tr>
+        </thead>
+        <tbody>
+            <% for(var booking of bookings){ %>
+          <tr>    
+            <td style = "color: #000; background: #C4c4c4" align="center"><h4 class="t1"><%= booking.title %></h4></th>
+            <td style = "color: #000;  background: #C4c4c4" align="center"><h4 class="t1"><%= booking.loc %></h4></th>
+            <td style = "color: #000; background: #C4c4c4" align="center"><h4 class="t1"><%= booking.starttime%></h4></td>
+            <td style = "color: #000; background: #C4c4c4" align="center"><h4 class="t1"><%= booking.duration %></h4></td>
+            <td style = "color: #000; background: #C4c4c4" align="center"><h4 class="t1"><%= booking.vehiclenumber %></h4></td>
+            <% if(time<booking.starttime){ %> 
+            <td  style = "color: #000; background: #C4c4c4" align="center">
+              <form method="POST">
+                <button type="submit" class="btn btn-lg  btn-block btl" formaction="/user/<%=user_id%>/<%=booking._id%>/cancel">Cancel Booking</button>
+              </form> 
+            </td>
+            <% } %>
+          </tr>
+           <% } %> 
+      </table>
+    </div>
+</body>
+</html>

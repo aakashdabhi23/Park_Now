@@ -11,6 +11,12 @@ const ejs=require('ejs');
 const Review=require("../models/Review");
 const _=require("lodash");
 const bodyParser=require("body-parser");
+const BookedSlots=require('../models/BookedSlot');
+const mongoose=require("mongoose");
+const nodemailer = require('nodemailer');
+const hbs=require('nodemailer-handlebars');
+const url = require('url');   
+const moment= require('moment-timezone'); 
 
 // // Get form for update user
 router.get('/:id/update-user',(req,res)=>{
@@ -72,7 +78,7 @@ router.post('/:id/update-user',(req,res)=>{
         });
     });
         }
-    });     
+    });    
 });
    
 
@@ -91,6 +97,7 @@ router.get('/:id/:p_id/reviews',async(req,res)=>{
             path: 'author'
         }
     });
+    console.log(parking)
     res.render('../views/feedback',{parking,user_id:req.params.id});
 })
 
@@ -107,7 +114,7 @@ router.post('/:id/:p_id/reviews',async(req,res)=>{
     
     await review.save();
     await parking.save();
-    req.flash('success_msg','Review Added Successfully');
+    req.flash('success_msg','Review created Successfully');
     res.redirect(`/user/${req.params.id}/${req.params.p_id}/reviews`);
 })
 router.delete('/:id/:p_id/reviews/:reviewId', async (req, res) => {
@@ -131,11 +138,10 @@ router.delete('/:id/:p_id/reviews/:reviewId', async (req, res) => {
     res.redirect(`/user/${req.params.id}/${req.params.p_id}/reviews`);
 })
 
-////////search option
+//search option
 // Get user index page
 router.post("/:id/search", async(req, res) => {
     let loc=req.body.place;
-    loc=_.startCase(_.toLower(loc));
     if(loc=="")
     {
         const parkings=await ParkingLocation.find({});
@@ -143,7 +149,7 @@ router.post("/:id/search", async(req, res) => {
     }
     else
     {
-	    const parkings=await ParkingLocation.find({location:loc});
+	    const parkings=await ParkingLocation.find({$or:[{location:new RegExp(loc, 'i')},{landmark1:new RegExp(loc, 'i')},{landmark2:new RegExp(loc, 'i')}]});
 	    res.render("../views/Customer_dash",{parkings:parkings,id:req.params.id});
     }
 });
@@ -163,7 +169,6 @@ function compare( a, b )
 
 router.post("/:id/sort", async(req, res) => {
     let loc=req.body.place;
-    loc=_.startCase(_.toLower(loc));
     let parkings;
     if(loc=="")
     {
@@ -171,10 +176,176 @@ router.post("/:id/sort", async(req, res) => {
     }
     else
     {
-	    parkings=await ParkingLocation.find({location:loc});
+	    parkings=await ParkingLocation.find({$or:[{location:new RegExp(loc, 'i')},{landmark1:new RegExp(loc, 'i')},{landmark2:new RegExp(loc, 'i')}]});
     }
     parkings.sort( compare );
 	res.render("../views/Customer_dash",{parkings:parkings,id:req.params.id});
 });
+
+
+//Booking Page
+router.get('/:id/bookings',async(req,res)=> {
+    let time=new Date();
+
+    var bookings= await BookedSlots.find({"user":req.params.id});
+    await Promise.all(bookings.map(async(booking)=> {
+        var loc = await ParkingLocation.findById(booking.location);
+        if(loc!=null)
+        {
+        booking.loc= loc.location;
+        booking.title=loc.title;
+        booking.starttime=String(booking.starttime);
+        console.log(booking.starttime);
+        }
+        return booking;
+    }));
+    res.render('../views/previousBooking',{bookings,user_id:req.params.id,time:time});
+})
+
+
+
+
+// Get request for date and time entry
+router.get('/:id/:p_id',async(req,res)=>{
+    res.render('../views/EnterBookingDetails',{parking_id:req.params.p_id,user_id:req.params.id});
+})
+
+// Post request for date and time entry
+router.post('/:id/:p_id',async(req,res)=>{
+
+    
+    var newStartTime=req.body.starttime;   ///starttime of booking
+    var startDate= req.body.startdate;     ///start date of booking
+    var startDateString=String(req.body.startdate).slice(0,10);
+    var startTime= req.body.starttime;
+    var start_book= new Date(startDate+"T"+startTime);
+    var jun = moment(start_book);
+    console.log(newStartTime);
+    newStartTime=start_book;
+    var duration= req.body.dur;
+    
+    var newEndTime=new Date(start_book.getTime()+duration*3600000);
+
+    var UndesiredSlots = await BookedSlots.find({"starttime": {"$lt": newEndTime},"endtime": {"$gt": newStartTime}, "location":req.params.p_id,"vehicletype":req.body.vtype})
+        
+    UndesiredSlots= UndesiredSlots.map((slot)=>{
+        return slot.slotnumber;
+    });
+    var number,price;
+    const vtype= req.body.vtype;
+    const curslot = await ParkingLocation.findById(req.params.p_id);
+    if(vtype.type==="two")
+    {
+        number=curslot.slot2w;
+        price=duration*curslot.price2w;
+    }
+    else
+    {
+        number=curslot.slot4w;
+        price=duration*curslot.price4w;
+    }
+    var slotno=-1;
+    for(var i = 1; i <= number; i++) {
+        if(UndesiredSlots.includes(i)) {
+            continue;
+        }
+        else{
+            slotno=i;
+            break;
+        }
+    }
+    console.log(req.params.id);
+    var infoo=await Userdb.findById(req.params.id);
+    console.log("asdfghj");
+    console.log(infoo);
+    if(slotno==-1)
+    {
+        req.flash('error_msg','Sorry,all slots are full for given date and time!');
+        res.redirect(`/user/${req.params.id}/${req.params.p_id}`);
+    }
+    else{
+        req.app.set('slotno',slotno);
+        req.app.set('price',price);
+        const Slots = {
+            location:req.params.p_id,
+            slotnumber:slotno,
+            startdate:startDateString,
+            starttime:newStartTime,
+            endtime:newEndTime,
+            duration:duration,
+            vehiclenumber:req.body.vno,
+            vehicletype:req.body.vtype,
+            price,
+            user:req.params.id,
+            name:infoo.name,
+            email:infoo.email,
+            contact:infoo.contact,
+            typee:1
+        };
+        req.app.set('Slots',Slots);
+        console.log(Slots);
+        req.flash('success_msg','Please complete your payment process!');
+        let s1=(String)(req.params.id);
+        let s2=(String)(req.params.p_id);
+      res.redirect(`/user/${req.params.id}/${req.params.p_id}/payment`);
+    }
+        
+})
+
+
+router.post('/:id/:b_id/cancel',async(req,res)=>{
+     
+    BookedSlots.findByIdAndDelete(req.params.b_id, function (err, docs)
+    {
+    });
+    id=req.params.id
+    res.redirect(`/user/${id}/bookings`);
+        
+});
+
+
+//Payment
+
+router.get('/:id/:p_id/payment',async(req,res)=> {
+
+    res.render('../views/payment',{slotno:req.app.get('slotno'),price:req.app.get('price'),id:req.params.id,p_id:req.params.p_id});
+})
+
+var transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: 'sri2021team14@gmail.com',
+        pass: process.env.EMAIL_PASS
+    }
+});
+
+router.post('/:id/:p_id/payment',async (req,res)=>{
+    var Slots= req.app.get('Slots');
+    var idUser=mongoose.Types.ObjectId(Slots.user);
+    var idLoca=mongoose.Types.ObjectId(Slots.location);
+    var user_detail = await Userdb.findById(idUser);
+    var location_detail= await ParkingLocation.findById(idLoca);
+    var email_content= await ejs.renderFile(path.join(__dirname, '..', 'views', 'invoice.ejs'),{starttime:Slots.starttime,endtime:Slots.endtime,vehicletype:Slots.vehicletype,vehiclenumber:Slots.vehiclenumber,slotnumber:Slots.slotnumber,price:Slots.price,user_name:user_detail.name,loc_title:location_detail.location,loc_name:location_detail.title});
+    var mailOptions = {
+        from: 'sri2021team14@gmail.com',
+        to: user_detail.email,
+        subject: 'Your Bill',
+        html: email_content
+    };   
+    
+    transporter.sendMail(mailOptions, async function(error, info) {
+        if (error) {
+            console.log(error);
+        } else {
+            Slots= new BookedSlots(Slots);        
+            await Slots.save();
+            req.flash('success_msg','Slot Booked Successfully');
+            res.redirect(`/user/${idUser}`);
+            
+        }
+    });
+});
+
+
 
 module.exports = router;

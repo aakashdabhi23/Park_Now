@@ -22,7 +22,11 @@
         
     }
 .row{
-  width: 100%;
+  width: 80%;
+  background-color: #c4c4c4;
+  margin-left: 150px;
+  margin-top: 100px;
+  margin-bottom: 100px;
 }
 .rect
 {
@@ -144,6 +148,6 @@
     margin-top: 10px;
     background: none;
     border: 2px solid #44AB5B;
-    color:black;
+    color:white;
     font-size: 18px;
 }

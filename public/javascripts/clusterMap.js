@@ -1,3 +1,4 @@
+
 mapboxgl.accessToken = mapToken;
 
 const map = new mapboxgl.Map({
@@ -8,15 +9,14 @@ const map = new mapboxgl.Map({
 });
 
 
+
 map.on('load', function () {
-    // Add a new source
-    // set the 'cluster' option to true
     map.addSource('parkings', {
         type: 'geojson',
         data:parkings,
         cluster: true,
-        clusterMaxZoom: 14, // Max zoom to cluster
-        clusterRadius: 50 // Radius of each cluster when clustering points
+        clusterMaxZoom: 14, // Max zoom to cluster points on
+        clusterRadius: 50 // Radius of each cluster when clustering points (defaults to 50)
     });
 
     map.addControl(
@@ -43,7 +43,6 @@ map.on('load', function () {
         source: 'parkings',
         filter: ['has', 'point_count'],
         paint: {
-           
             'circle-color': [
                 'step',
                 ['get', 'point_count'],

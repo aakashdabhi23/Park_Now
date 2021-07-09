@@ -114,7 +114,6 @@ router.post("/user/login", (req, res, next) => {
 			if (error) {
 				console.log(error);
 			}
-			//req.user=user;
 			const token = jwt.sign({ user }, process.env.ACCESS_TOKEN, {
 				algorithm: "HS256",
 				expiresIn: jwtExpirySeconds,
@@ -142,7 +141,6 @@ router.post("/owner/login", (req, res, next) => {
 			if (error) {
 				console.log(error);
 			}
-			//req.owner=owner;
 			const token = jwt.sign({ owner }, process.env.ACCESS_TOKEN, {
 				algorithm: "HS256",
 				expiresIn: jwtExpirySeconds,

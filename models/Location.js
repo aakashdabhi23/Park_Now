@@ -22,6 +22,8 @@ const ParkingLocationSchema=new Schema({
     slot4w:Number,
     description:String,
     location:String,
+    landmark1:String,
+    landmark2:String,
     owner:{
         type:Schema.Types.ObjectId,
         ref:'owner'
@@ -37,7 +39,7 @@ const ParkingLocationSchema=new Schema({
     }
 },opts);
 ParkingLocationSchema.virtual('properties.data').get(function () {
-    const obj={pid: this._id, title: this.title , description: this.description.substring(0, 20)};
+    const obj={pid: this._id, title: this.title ,description: this.description.substring(0, 20)};
     return obj;
 });
 module.exports=mongoose.model('ParkingLocation',ParkingLocationSchema);

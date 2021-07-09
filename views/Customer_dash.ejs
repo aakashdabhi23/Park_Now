@@ -18,10 +18,25 @@
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.js"></script>
     <link href="https://api.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.css" rel="stylesheet" />
     
-    <title>Customer Dashboard</title>
+    <title>Parkings</title>
 </head>
 
+<style>
+  .btl{
+	color:white;
+	background-color: #44ab5b;
+	font-size: 15px !important;
+	font-weight: bold !important;
+	
+}
 
+.btl:hover{
+	color:black;
+	background-color: #fff;
+	font-size: 22px;
+	font-weight: bolder;
+}
+</style>
 <body id="mapage">
 
    <nav class="navbar sticky-top shadow p-2 mb-2">
@@ -56,7 +71,7 @@
                <i class="fas fa-user-circle"></i>
                 <ul style="list-style-type:none;">
                   <li>
-                    <a>View Bookings</a>
+                    <a href="/user/<%=id%>/bookings">View Bookings</a>
                   </div>
                   <li>
                     <a href="/user/<%=id%>/update-user">Update User</a>
@@ -80,12 +95,13 @@
     <div  class="mapdown col-lg-6 col-sm-12 col-md-12" >
 
       <div style="display: flex;align-items: center;justify-content: center;">
-        <form method="POST" style="width: 100%;">
-        <input type="text" name="place" placeholder="Enter Location" style="border: none;border-radius: 8px;;margin-top: 10px;height: 35px;width:50%;">
-        <button type="submit" class="btn btn-primary" formaction="/user/<%=id%>/search" value="Search" style="margin-bottom: 10px;margin-right:1px; width: 18%;height: 35px;">Search</button>
-        <button type="submit" value="Sort" class="btn btn-primary" formaction="/user/<%=id%>/sort" style="margin-bottom: 10px;width: 15%;height: 35px;">Sort</button>
+        <form method="POST">
+
+        <input type="text" name="place" placeholder="Enter Location/Landmark" style="border: none;border-radius: 8px;margin-top: 10px;height: 35px;width:290px;">
+        <button type="submit" class="btn btn-primary" formaction="/user/<%=id%>/search" value="Search" style="margin-bottom: 10px;margin-right:1px; width: 90px;height: 35px;">Search</button>
+        <button type="submit" value="Sort" class="btn btn-primary" formaction="/user/<%=id%>/sort" style="margin-bottom: 10px;width: 70px;height: 35px;">Sort</button>
         </form>
-       
+  
       </div>  
       <ul style="list-style-type:none;">
         <% for(var parking of parkings) {%>
@@ -104,8 +120,10 @@
                           <p class="card-text txt"> <i class="fas fa-car-side"></i>: ₹ <%= parking.price4w %></p>
                           <p class="card-text txt"> <i class="fas fa-star"></i>:<%= parking.avgrating %></p>
                           
-                        <a class="btn btn-primary">Book Slot</a>
-                        <a class="btn btn-primary" href="/user/<%= id %>/<%=parking._id%>/reviews">Add Feedback</a>
+
+                        <a class="btn btn-lg  btn-block btl" href="/user/<%= id %>/<%=parking._id%>">Book Slot</a>
+                       
+                       <a class="btn btn-lg  btn-block btl" href="/user/<%= id %>/<%=parking._id%>/reviews">Add Feedback</a>
                         </div>
                       </div>
                     </div>

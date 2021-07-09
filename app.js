@@ -12,6 +12,11 @@ const ownerControllers = require("./controllers/ownerControllers");
 const methodOverride = require('method-override');
 const session = require('express-session');
 const flash= require('connect-flash');
+const ParkingLocation=require("./models/Location");
+const nodemailer = require('nodemailer');
+const hbs=require('nodemailer-handlebars');
+var Ownerdb=require('./models/Owners');
+var Feedback=require('./models/Feedback');
 
 const app = express();
 app.use(passport.initialize());
@@ -55,6 +60,18 @@ app.use((req,res,next)=>{
   res.locals.error_msg = req.flash('error_msg');
   next();
 });
+
+app.post('/feedbacko', async function(req,res){
+	const fd=new Feedback({
+		name:req.body.name,
+		email:req.body.email,
+		desc:req.body.message
+	});
+	fd.save();
+	
+    res.redirect("/");
+});
+
 
 app.use("/", indexControllers);
 app.use(

@@ -11,13 +11,14 @@
 
     <link rel="stylesheet" href="css/bootstrap1.min.css">
     <link rel="stylesheet" href="css/style1.css">
+    <link rel="stylesheet" href="css/owl-carousel.css">
 
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800" rel="stylesheet">
     <style>
         .service-item{
             width:250px;
             height: 300px;
-        }
+        }  
     </style>
     <title>Home</title>
   </head>
@@ -37,6 +38,9 @@
         </div>
     </div>
 
+  
+    
+    
       <div class="service-content" id="services">
         <div class="container">
             <div class="row">
@@ -96,8 +100,9 @@
                             <div id="contact" >
                                 <div class="row">
                                     <div class="col-md-12">
+                                        <form method="POST">
                                         <fieldset>
-                                            <h4>Please provide your valuable feedback about the webapp</h4>
+                                            <h2 style="color: white;display: flex;align-items: center;justify-content: center;">Provide Your Valuable Feedback To Us</h2>
                                         </fieldset>
                                       <fieldset>
                                         <input name="name" type="text" class="form-control" id="name" placeholder="Your name..." required="">
@@ -114,9 +119,10 @@
                                       </fieldset>
                                     </div>
                                     <div class="col-md-12">
-                                      <fieldset>
-                                        <button href="#home" id="form-submit" class="btn">Send Message</button>
+                                      <fieldset style="display: flex;align-items: center;justify-content: center;">
+                                        <button type="submit" formaction="/feedbacko" id="form-submit" class="btn" style="width: 20%;">Send Message</button>
                                       </fieldset>
+                                    </form>
                                     </div>
                                 </div>
                             </div>

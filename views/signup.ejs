@@ -208,7 +208,7 @@ body {
 }
 
 .btl{
-	color:black;
+	color:white;
 	background-color: #44ab5b;
 	font-size: 18px !important;
 	font-weight: bold !important;
@@ -261,8 +261,9 @@ body {
   </div>
 
  <% } %>
-
-    
+ <div align = "center" >
+ <h3 style="color: black; font-weight: bolder; padding-top: 30px ">Sign up</h3>
+ </div>
 	  <div class="row">
 		<div class="col-lg-10 col-xl-10 mx-auto" >
 		  <div class="card card-signin flex-row my-5">
@@ -270,18 +271,17 @@ body {
          
 			</div>
 			<div class="card-body">
-			  <h5 class="card-title text-left" style="color: black; font-weight: bolder;">Sign up</h5>
 			  
 			  
 			  <form class="form-signin" action="/signup" method="POST" id="register">
           <div class="form-label-group" style = "background-color: transparent; ">
             <input type="name" id="name" name="name" class="form-control" placeholder="Enter name" required>
-            <label for="name" style = "color: black">Enter name</label>
+            <label for="name" style = "color: black; opacity: 0.5;">Enter name</label>
            
           </div>
 				<div class="form-label-group" style = "background-color: transparent;">
 				  <input type="email" id="email" name="email" class="form-control" placeholder="Email address" required>
-				  <label for="email" style = "color: black">Enter Email address</label>
+				  <label for="email" style = "color: black ; opacity: 0.5;">Enter Email address</label>
 				 
 				</div>
 
@@ -297,11 +297,11 @@ body {
       maxlength="10"
           style="width: 100% !important;"
           required/>
-          <label for="contact" style = "color: black">Enter contact</label>
+          <label for="contact" style = "color: black; opacity: 0.5;">Enter contact</label>
     </div>
     <div class="col-md-12" style = "background-color: transparent; height: 59px;margin-bottom: 20px;">
       <select name="category" id="category" class="inp"  onchange="changeaction()" style="height: 55px;
-			line-height: 1.5; color: black; padding-left: 20px; width: 100%; font-size: 19px;
+			line-height: 1.5; color: black ; padding-left: 20px; width: 100%; font-size: 19px;
 			border: none; border-bottom: 2px solid #44AB5B; background: transparent !important; outline: none;">
 				
 				<option value="user" class="l1">Customer</option>
@@ -321,7 +321,7 @@ body {
           minlength="8"
           required
         />
-        <label for="password" class="inpt" style = "color: black">Password</label>
+        <label for="password" class="inpt" style = "color: black; opacity: 0.5;">Password</label>
   </div>
     <div class="form-label-group col-md-12" style = "background-color: transparent;">
        
@@ -334,7 +334,7 @@ body {
           minlength="8"
           required
         />
-        <label for="password2" class="inpt" style = "color: black">Confirm Password</label>
+        <label for="password2" class="inpt" style = "color: black; opacity: 0.5;">Confirm Password</label>
       </div></div>
 				
   <br>

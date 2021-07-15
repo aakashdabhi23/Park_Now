@@ -5,6 +5,7 @@ const ParkingLocation=require("../models/Location");
 const bcrypt = require("bcryptjs");
 const Owner=require("../models/Owners");
 const BookedSlots=require('../models/BookedSlot');
+const OtpDb=require('../models/Otp');
 var Userdb=require('../models/Users');
 const _=require("lodash");
 const nodemailer = require('nodemailer');
@@ -16,21 +17,7 @@ const path = require('path');
 const mbxGeocoding = require("@mapbox/mapbox-sdk/services/geocoding");
 const mapBoxToken=process.env.MAPBOX_TOKEN;
 
-//console.log(mapBoxToken);
 const geocoder=mbxGeocoding({accessToken:mapBoxToken});
-
-
-async function registration(category, email) 
-{
-	if (category === "user") 
-	{
-		return User.findOne({ email: email });
-	} 
-	else 
-	{
-		return Owner.findOne({ email: email });
-	}
-}
 
 //get method to show new parking form
 router.get('/:id/newParking',(req,res)=>{
@@ -52,7 +39,7 @@ router.post('/:id',async(req,res)=>{
     parking.landmark1= _.startCase(_.toLower( parking.landmark1));
     parking.landmark2= _.startCase(_.toLower( parking.landmark2));
     await parking.save();
-    req.flash('success_msg','New Location added successfully');
+    req.flash('success_msg','New Parking Lot Added Successfully');
     res.redirect(`/owner/${req.owner._id}`);
 })
 
@@ -141,13 +128,10 @@ router.get('/:id/:p_id',async(req,res)=>{
 	const id=req.params.id;
     const p_id=req.params.p_id;
     let today=new Date();
-    console.log(today);
     var dd = String(today.getDate()).padStart(2, '0');
     var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
     var yyyy = today.getFullYear();
-
     todayString=yyyy +'-'+ mm +'-'+ dd;
-    console.log(todayString);
     const bookings= await BookedSlots.find({location: req.params.p_id, startdate:todayString});
     res.render('parkings/show',{parking,id,bookings,p_id});
 });
@@ -163,9 +147,7 @@ router.post('/:id/:p_id/sortByDate',async(req,res)=>{
 	const id=req.params.id;
     const p_id=req.params.p_id;
     let sortdate=String(req.body.date).slice(0,10);
-    console.log(req.body.date);
     const bookings= await BookedSlots.find({location: req.params.p_id,startdate:sortdate});
-    console.log(bookings);
     res.render('parkings/show',{parking,id,bookings,p_id});
 });
 
@@ -180,9 +162,7 @@ router.post('/:id/:p_id/sales',async(req,res)=>{
 	const id=req.params.id;
     const p_id=req.params.p_id;
     let sortdate=String(req.body.date).slice(0,10);
-    console.log(req.body.date);
     const bookings= await BookedSlots.find({location: req.params.p_id,startdate:sortdate});
-    console.log(bookings);
     await Promise.all(bookings.map(async(booking)=> {
         if(booking.vehicletype=="two")
         {
@@ -212,20 +192,29 @@ router.get('/:id/:p_id/delete',async(req,res)=>{
 var transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user: 'sri2021team14@gmail.com',
+        user: process.env.EMAIL_ID,
         pass: process.env.EMAIL_PASS
     }
 });
 
+
+//OTP
 router.post('/:id/:p_id/OTP', async(req,res)=>{
     let idBooking=mongoose.Types.ObjectId(req.body.booking_id);
     let currBook=await BookedSlots.findById({_id:idBooking});  
     var otpno=Math.floor((Math.random()*1000000)+1);
+
+    const currotp = new OtpDb({
+        usremail:currBook.email,
+        OTPno:otpno
+    });
+    await currotp.save();
+
     var email_content= `Your OTP Is:${otpno}`;
     var mailOptions = {
-        from: 'sri2021team14@gmail.com',
+        from: process.env.EMAIL_ID,
         to: currBook.email,
-        subject: 'Your OTP',
+        subject: 'Your OTP From Park Now',
         html: email_content
     };   
 
@@ -233,37 +222,62 @@ router.post('/:id/:p_id/OTP', async(req,res)=>{
         if (error) {
             console.log(error);
         } else {
-            console.log('Email sent: ' + info.response);
-            req.flash('success_msg',`OTP for ${currBook.name} is: ${otpno}`);
+            // console.log('Email sent: ' + info.response);
+            req.flash('success_msg',"OTP Sent Successfully");
             res.redirect(`/owner/${req.params.id}/${req.params.p_id}`);  
             
         }
     });
 })
 
+
+//Confirm OTP
 router.post('/:id/:p_id/release', async(req,res)=>{
     let idBooking=mongoose.Types.ObjectId(req.body.booking_id);
-    console.log(idBooking);
-    console.log(typeof(idBooking));
     let newendtime=new Date();
     let currBook=await BookedSlots.findById({_id:idBooking}); 
     let newstarttime=currBook.starttime;
-    console.log(currBook.starttime);
-    console.log(newendtime);
     if(currBook.starttime>newendtime)
     {
         newstarttime=newendtime
     }
-    BookedSlots.findByIdAndUpdate(idBooking,{typee:0,endtime:newendtime,starttime:newstarttime},  function (err, docs) {
-        if (err){
-            console.log(err)
-        }
-        else{
-            console.log("Updated User : ", docs);
-        }
-    });
-    req.flash('success_msg',`${currBook.name} successfully exited`);
-    res.redirect(`/owner/${req.params.id}/${req.params.p_id}`); 
+
+    let otpc = await OtpDb.findOne({$and:[{usremail:currBook.email},{OTPno:req.body.checkotp}]});
+
+    if(otpc===null)
+    {
+        req.flash('error_msg',"Incorrect OTP");
+        res.redirect(`/owner/${req.params.id}/${req.params.p_id}`); 
+    }
+
+    else {
+    let otps=String(otpc.OTPno);
+
+    if((otpc.usremail===currBook.email) && (otps===req.body.checkotp))
+    {
+        await OtpDb.findOneAndDelete({$and:[{usremail:currBook.email},{OTPno:req.body.checkotp}]});
+
+        BookedSlots.findByIdAndUpdate(idBooking,{typee:0,endtime:newendtime,starttime:newstarttime},  function (err, docs) {
+            if (err){
+                console.log(err)
+            }
+            else{
+                console.log("Successfully Updated");
+            }
+        });
+        req.flash('success_msg',`${currBook.name} successfully exited`);
+        res.redirect(`/owner/${req.params.id}/${req.params.p_id}`); 
+
+    }
+
+    else
+    {
+        req.flash('error_msg',"Incorrect OTP");
+        res.redirect(`/owner/${req.params.id}/${req.params.p_id}`); 
+    }
+}
+
+   
    
    
 })
@@ -293,15 +307,29 @@ router.post("/:id/:p_id/emergency", async(req, res) => {
     var number,price;
     const vtype= req.body.vtype;
     const curslot = await ParkingLocation.findById(req.params.p_id);
-    if(vtype.type==="two")
+    if(vtype==="two")
     {
         number=curslot.slot2w;
-        price=duration*curslot.price2w;
+        if(duration<curslot.lbookinghr)
+        {
+            price=duration*curslot.price2w;
+        }
+        else
+        {
+            price=duration*curslot.price2w*curslot.newfactor;
+        }    
     }
     else
     {
         number=curslot.slot4w;
-        price=duration*curslot.price4w;
+        if(duration<curslot.lbookinghr)
+        {
+            price=duration*curslot.price4w;
+        }
+        else
+        {
+            price=duration*curslot.price4w*curslot.newfactor;
+        }    
     }
     var slotno=-1;
     for(var i = 1; i <= number; i++) {
@@ -317,16 +345,16 @@ router.post("/:id/:p_id/emergency", async(req, res) => {
     if(slotno==-1)
     {
         req.flash('error_msg','Sorry,all slots are full for given date and time!');
-        res.redirect(`/user/${req.params.id}/${req.params.p_id}`);
+        res.redirect(`/owner/${req.params.id}/${req.params.p_id}`); 
     }
     else{
 
         var location_detail= await ParkingLocation.findById(req.params.p_id);
         var email_content= await ejs.renderFile(path.join(__dirname, '..', 'views', 'invoice.ejs'),{starttime:newStartTime,endtime:newEndTime,vehicletype:req.body.vtype,vehiclenumber:req.body.vno,slotnumber:slotno,price:price,user_name:req.body.name,loc_title:location_detail.location,loc_name:location_detail.title});
         var mailOptions = {
-            from: 'sri2021team14@gmail.com',
+            from:process.env.EMAIL_ID,
             to: req.body.email,
-            subject: 'Your Bill',
+            subject: 'Your Bill From Park Now',
             html: email_content
         };   
         
@@ -352,7 +380,6 @@ router.post("/:id/:p_id/emergency", async(req, res) => {
             typee:1
         });
         Slots.save();        
-        console.log(Slots);
         req.flash('success_msg','Slot Booked Successfully');
         res.redirect(`/owner/${req.params.id}/${req.params.p_id}`); 
         } 

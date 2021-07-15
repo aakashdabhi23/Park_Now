@@ -97,7 +97,6 @@ router.get('/:id/:p_id/reviews',async(req,res)=>{
             path: 'author'
         }
     });
-    console.log(parking)
     res.render('../views/feedback',{parking,user_id:req.params.id});
 })
 
@@ -195,7 +194,6 @@ router.get('/:id/bookings',async(req,res)=> {
         booking.loc= loc.location;
         booking.title=loc.title;
         booking.starttime=String(booking.starttime);
-        console.log(booking.starttime);
         }
         return booking;
     }));
@@ -220,7 +218,6 @@ router.post('/:id/:p_id',async(req,res)=>{
     var startTime= req.body.starttime;
     var start_book= new Date(startDate+"T"+startTime);
     var jun = moment(start_book);
-    console.log(newStartTime);
     newStartTime=start_book;
     var duration= req.body.dur;
     
@@ -234,15 +231,29 @@ router.post('/:id/:p_id',async(req,res)=>{
     var number,price;
     const vtype= req.body.vtype;
     const curslot = await ParkingLocation.findById(req.params.p_id);
-    if(vtype.type==="two")
+    if(vtype==="two")
     {
         number=curslot.slot2w;
-        price=duration*curslot.price2w;
+        if(duration<curslot.lbookinghr)
+        {
+            price=duration*curslot.price2w;
+        }
+        else
+        {
+            price=duration*curslot.price2w*curslot.newfactor;
+        }    
     }
     else
     {
         number=curslot.slot4w;
-        price=duration*curslot.price4w;
+        if(duration<curslot.lbookinghr)
+        {
+            price=duration*curslot.price4w;
+        }
+        else
+        {
+            price=duration*curslot.price4w*curslot.newfactor;
+        }    
     }
     var slotno=-1;
     for(var i = 1; i <= number; i++) {
@@ -254,10 +265,9 @@ router.post('/:id/:p_id',async(req,res)=>{
             break;
         }
     }
-    console.log(req.params.id);
+
     var infoo=await Userdb.findById(req.params.id);
-    console.log("asdfghj");
-    console.log(infoo);
+
     if(slotno==-1)
     {
         req.flash('error_msg','Sorry,all slots are full for given date and time!');
@@ -283,10 +293,7 @@ router.post('/:id/:p_id',async(req,res)=>{
             typee:1
         };
         req.app.set('Slots',Slots);
-        console.log(Slots);
         req.flash('success_msg','Please complete your payment process!');
-        let s1=(String)(req.params.id);
-        let s2=(String)(req.params.p_id);
       res.redirect(`/user/${req.params.id}/${req.params.p_id}/payment`);
     }
         
@@ -305,7 +312,6 @@ router.post('/:id/:b_id/cancel',async(req,res)=>{
 
 
 //Payment
-
 router.get('/:id/:p_id/payment',async(req,res)=> {
 
     res.render('../views/payment',{slotno:req.app.get('slotno'),price:req.app.get('price'),id:req.params.id,p_id:req.params.p_id});
@@ -314,7 +320,7 @@ router.get('/:id/:p_id/payment',async(req,res)=> {
 var transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user: 'sri2021team14@gmail.com',
+        user: process.env.EMAIL_ID,
         pass: process.env.EMAIL_PASS
     }
 });
@@ -327,9 +333,9 @@ router.post('/:id/:p_id/payment',async (req,res)=>{
     var location_detail= await ParkingLocation.findById(idLoca);
     var email_content= await ejs.renderFile(path.join(__dirname, '..', 'views', 'invoice.ejs'),{starttime:Slots.starttime,endtime:Slots.endtime,vehicletype:Slots.vehicletype,vehiclenumber:Slots.vehiclenumber,slotnumber:Slots.slotnumber,price:Slots.price,user_name:user_detail.name,loc_title:location_detail.location,loc_name:location_detail.title});
     var mailOptions = {
-        from: 'sri2021team14@gmail.com',
+        from: process.env.EMAIL_ID,
         to: user_detail.email,
-        subject: 'Your Bill',
+        subject: 'Your Bill From Park Now',
         html: email_content
     };   
     

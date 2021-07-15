@@ -1,4 +1,5 @@
 const mongoose=require('mongoose');
+require('mongoose-double')(mongoose);
 const Schema=mongoose.Schema;
 
 const opts={toJSON:{virtuals:true}};
@@ -24,6 +25,11 @@ const ParkingLocationSchema=new Schema({
     location:String,
     landmark1:String,
     landmark2:String,
+    lbookinghr:Number,
+    newfactor:{
+        type:Number,
+        required:true
+    },    
     owner:{
         type:Schema.Types.ObjectId,
         ref:'owner'

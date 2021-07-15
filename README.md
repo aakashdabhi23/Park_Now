@@ -15,6 +15,9 @@ npm install
 ```
     DBURI=MongoDB URL
     ACCESS_TOKEN=Secret Key
+    MAPBOX_TOKEN=API Token
+    EMAIL_ID=Your Email
+    EMAIL_PASS=Password of your Email
     
 ```
 5) Now you can run the code using following command.

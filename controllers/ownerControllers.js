@@ -192,7 +192,7 @@ router.get('/:id/:p_id/delete',async(req,res)=>{
 var transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user: 'sri2021team14@gmail.com',
+        user: process.env.EMAIL_ID,
         pass: process.env.EMAIL_PASS
     }
 });
@@ -212,7 +212,7 @@ router.post('/:id/:p_id/OTP', async(req,res)=>{
 
     var email_content= `Your OTP Is:${otpno}`;
     var mailOptions = {
-        from: 'sri2021team14@gmail.com',
+        from: process.env.EMAIL_ID,
         to: currBook.email,
         subject: 'Your OTP From Park Now',
         html: email_content
@@ -352,7 +352,7 @@ router.post("/:id/:p_id/emergency", async(req, res) => {
         var location_detail= await ParkingLocation.findById(req.params.p_id);
         var email_content= await ejs.renderFile(path.join(__dirname, '..', 'views', 'invoice.ejs'),{starttime:newStartTime,endtime:newEndTime,vehicletype:req.body.vtype,vehiclenumber:req.body.vno,slotnumber:slotno,price:price,user_name:req.body.name,loc_title:location_detail.location,loc_name:location_detail.title});
         var mailOptions = {
-            from:'sri2021team14@gmail.com',
+            from:process.env.EMAIL_ID,
             to: req.body.email,
             subject: 'Your Bill From Park Now',
             html: email_content

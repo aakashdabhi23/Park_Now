@@ -320,7 +320,7 @@ router.get('/:id/:p_id/payment',async(req,res)=> {
 var transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user: 'sri2021team14@gmail.com',
+        user: process.env.EMAIL_ID,
         pass: process.env.EMAIL_PASS
     }
 });
@@ -333,7 +333,7 @@ router.post('/:id/:p_id/payment',async (req,res)=>{
     var location_detail= await ParkingLocation.findById(idLoca);
     var email_content= await ejs.renderFile(path.join(__dirname, '..', 'views', 'invoice.ejs'),{starttime:Slots.starttime,endtime:Slots.endtime,vehicletype:Slots.vehicletype,vehiclenumber:Slots.vehiclenumber,slotnumber:Slots.slotnumber,price:Slots.price,user_name:user_detail.name,loc_title:location_detail.location,loc_name:location_detail.title});
     var mailOptions = {
-        from: 'sri2021team14@gmail.com',
+        from: process.env.EMAIL_ID,
         to: user_detail.email,
         subject: 'Your Bill From Park Now',
         html: email_content

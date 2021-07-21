@@ -38,6 +38,7 @@ router.post('/:id',async(req,res)=>{
     parking.location= _.startCase(_.toLower( parking.location));
     parking.landmark1= _.startCase(_.toLower( parking.landmark1));
     parking.landmark2= _.startCase(_.toLower( parking.landmark2));
+    parking.flag=1;
     await parking.save();
     req.flash('success_msg','New Parking Lot Added Successfully');
     res.redirect(`/owner/${req.owner._id}`);
@@ -181,9 +182,16 @@ router.post('/:id/:p_id/sales',async(req,res)=>{
 
 
 router.get('/:id/:p_id/delete',async(req,res)=>{
-    ParkingLocation.findByIdAndDelete(req.params.p_id, function (err, docs)
-    {
+
+    ParkingLocation.findByIdAndUpdate(req.params.p_id,{flag:0},  function (err, docs) {
+        if (err){
+            console.log(err)
+        }
+        else{
+            console.log("Successfully Updated");
+        }
     });
+
     id=req.params.id
     res.redirect(`/owner/${id}`);
 

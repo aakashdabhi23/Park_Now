@@ -217,7 +217,7 @@
     <div>    
         <% for(let parking of parkings) {%>
             
-        
+        <% if(parking.flag) { %>
         <div class="card mb-4 align-items-stretch" style="width: 18rem;">
             <img src="/css/img/pr.jpg" class="card-img-top" alt="PR" style="height: 250px;">
             <div class="card-body">
@@ -226,6 +226,7 @@
               <a href="/owner/<%=id%>/<%=parking._id%>/delete" class="btn btn-primary">Delete</a>
             </div>
           </div>
+          <% } %> 
           <% } %> 
         </div>
     

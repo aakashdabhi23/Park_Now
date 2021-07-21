@@ -29,7 +29,8 @@ const ParkingLocationSchema=new Schema({
     newfactor:{
         type:Number,
         required:true
-    },    
+    },  
+    flag:Number,  
     owner:{
         type:Schema.Types.ObjectId,
         ref:'owner'

@@ -105,6 +105,7 @@
       </div>  
       <ul style="list-style-type:none;">
         <% for(var parking of parkings) {%>
+          <% if(parking.flag) { %>
             <li>
                 <div class="card mb-3" style="max-width: 800px; margin:60px">
                     <div class="row g-0">
@@ -129,7 +130,8 @@
                     </div>
                   </div>   
                 
-                </li>    
+                </li>   
+                <% } %>   
         <% } %>  
     </ul>
 </div>
